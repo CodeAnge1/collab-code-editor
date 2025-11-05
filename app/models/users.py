@@ -10,4 +10,4 @@ class User(Base):
 	id: Mapped[int] = mapped_column(primary_key=True)
 	username: Mapped[str] = mapped_column(String(40), unique=True)
 	email: Mapped[str] = mapped_column(String(256), unique=True)
-	hashed_password: Mapped[str]
+	hashed_password: Mapped[str] = mapped_column(nullable=False)
