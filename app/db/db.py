@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from ..config import settings
-from ..models import Base
+from ..models.base import Base
 
 engine = create_engine(
 	url=settings.db_cfg.get_url(),
@@ -19,5 +19,8 @@ def create_tables():
 
 
 def get_session():
-	with session_factory() as session:
+	session = session_factory()
+	try:
 		yield session
+	finally:
+		session.close()
