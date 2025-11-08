@@ -27,6 +27,7 @@ class JWTConfig(BaseSettings):
 	secret_key: SecretStr = Field(alias="JWT_SECRET_KEY")
 	algorithm: str = Field(alias="JWT_ALGORITHM", default="HS256")
 	access_token_expire_minutes: int = Field(alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES", default=30)
+	refresh_token_expire_days: int = Field(alias="JWT_REFRESH_TOKEN_EXPIRE_DAYS", default=7)
 
 	model_config = SettingsConfigDict(
 		env_prefix="JWT_",

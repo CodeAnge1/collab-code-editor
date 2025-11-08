@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from ..crud import get_user_by_username, get_user_by_email, create_user
+from ..crud import get_user_by_credentials, get_user_by_username, get_user_by_email, create_user
+from ..config import settings
 from ..db import get_session
 from ..models import User
 from ..schemas.users import *
-from ..utils import create_access_token, get_current_user, verify_password
+from ..utils import create_access_token, create_refresh_token, get_current_user, verify_password, refresh_access_token
 
 router = APIRouter(
 	prefix="/users",
@@ -30,22 +31,53 @@ def register(user: UserAdd, db: Session = Depends(get_session)):
 
 
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_session)):
-	user = get_user_by_username(db, form_data.username)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_session), response: Response = None):
+	user = get_user_by_credentials(db, form_data.username, form_data.username)
 	if not user or not verify_password(form_data.password, user.hashed_password):
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Incorrect username or password",
-			headers={"WWW-Authenticate": "Bearer"}
+			detail="Incorrect username or password"
 		)
 	data = {
 		"sub": str(user.username),
 	}
-	result = {
-		"access_token": create_access_token(data),
-		"token_type": "bearer"
-	}
-	return result
+	access_tok = create_access_token(data)
+	refresh_tok = create_refresh_token(data)
+	response.set_cookie(
+		key="access_token",
+		value=access_tok,
+		max_age=settings.jwt_cfg.access_token_expire_minutes * 60,
+		path="/",
+		samesite="strict",
+		secure=True,
+		httponly=True,
+	)
+	response.set_cookie(
+		key="refresh_token",
+		value=refresh_tok,
+		max_age=settings.jwt_cfg.refresh_token_expire_days * 24 * 3600,
+		path="/",
+		samesite="strict",
+		secure=True,
+		httponly=True,
+	)
+	return {"msg": "Login successful"}
+
+
+@router.post("/refresh")
+def refresh_token(new_access_token: str = Depends(refresh_access_token), response: Response = None):
+	if not new_access_token:
+		raise HTTPException(401, "No refresh token provided")
+	response.set_cookie(
+		key="access_token",
+		value=new_access_token,
+		max_age=settings.jwt_cfg.access_token_expire_minutes * 60,
+		path="/",
+		samesite="strict",
+		secure=True,
+		httponly=True,
+	)
+	return {"msg": "Access token refreshed"}
 
 
 @router.get("/me", response_model=UserInfo)
