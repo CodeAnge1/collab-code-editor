@@ -2,13 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .db.db import create_tables
 from .routes import users
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-	create_tables()
+async def lifespan(_app: FastAPI):
 	yield
 
 
