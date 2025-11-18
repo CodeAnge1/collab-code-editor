@@ -6,17 +6,22 @@ from ..schemas.users import UserAdd
 from ..utils.security import get_password_hash
 
 
-def get_user_by_username(db: Session, username: str):
+def get_user_by_id(db: Session, user_id: int) -> User | None:
+	user = db.query(User).filter(User.id == user_id).first()
+	return user
+
+
+def get_user_by_username(db: Session, username: str) -> User | None:
 	user = db.query(User).filter(User.username == username).first()
 	return user
 
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> User | None:
 	user = db.query(User).filter(User.email == email).first()
 	return user
 
 
-def get_user_by_credentials(db: Session, username: str, email: str):
+def get_user_by_credentials(db: Session, username: str, email: str) -> User | None:
 	user = db.query(User).filter(or_(
 		User.username == username,
 		User.email == email
@@ -24,7 +29,7 @@ def get_user_by_credentials(db: Session, username: str, email: str):
 	return user
 
 
-def create_user(db: Session, user: UserAdd):
+def create_user(db: Session, user: UserAdd) -> User:
 	hashed_password = get_password_hash(user.password)
 	new_user = User(
 		username=user.username,
