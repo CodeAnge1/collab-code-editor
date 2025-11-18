@@ -1,5 +1,7 @@
+from typing import List
+
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -11,3 +13,5 @@ class User(Base):
 	username: Mapped[str] = mapped_column(String(40), unique=True)
 	email: Mapped[str] = mapped_column(String(256), unique=True)
 	hashed_password: Mapped[str] = mapped_column(nullable=False)
+
+	room_users: Mapped[List["RoomUser"]] = relationship("RoomUser", back_populates="user")
