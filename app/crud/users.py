@@ -1,9 +1,9 @@
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from ..models.users import User
-from ..schemas.users import UserAdd
-from ..utils.security import get_password_hash
+from app.models.users import User
+from app.schemas.users import UserAdd
+from app.utils.security import get_password_hash
 
 
 def get_user_by_id(db: Session, user_id: int) -> User | None:

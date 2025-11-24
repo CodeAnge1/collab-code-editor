@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .routes import users, rooms
+from app.routes import users, rooms
 
 
 @asynccontextmanager
