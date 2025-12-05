@@ -1,4 +1,3 @@
-from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.models.users import User
@@ -21,11 +20,11 @@ def get_user_by_email(db: Session, email: str) -> User | None:
 	return user
 
 
-def get_user_by_credentials(db: Session, username: str, email: str) -> User | None:
-	user = db.query(User).filter(or_(
-		User.username == username,
-		User.email == email
-	)).first()
+def get_user_by_credentials(db: Session, name_or_email: str) -> User | None:
+	if "@" in name_or_email:
+		user = get_user_by_email(db, name_or_email)
+	else:
+		user = get_user_by_username(db, name_or_email)
 	return user
 
 
