@@ -18,7 +18,7 @@ router = APIRouter(
 @router.get("/", response_model=List[RoomInfo])
 def get_user_rooms(db: Session = Depends(get_session), cur_user: User = Depends(get_current_user)):
 	user_rooms = rooms.get_user_rooms(db, cur_user.id)
-	return [RoomInfo.model_validate(room) for room in user_rooms] if user_rooms else None
+	return [RoomInfo.model_validate(room) for room in user_rooms] if user_rooms else []
 
 
 @router.post("/", response_model=RoomInfo)
