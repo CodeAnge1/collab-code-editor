@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, BeforeValidator, EmailStr, model_validator
+from pydantic import BaseModel, BeforeValidator, EmailStr, Field
 
 
 def strip_and_lower(v: object) -> str | None:
@@ -8,24 +8,18 @@ def strip_and_lower(v: object) -> str | None:
 
 
 email_type = Annotated[EmailStr, BeforeValidator(strip_and_lower)]
+username_type = Annotated[str, Field(pattern=r"^\w+$", min_length=5, max_length=40)]
 
 
 class UserAdd(BaseModel):
-	username: str
+	username: username_type
 	email: email_type
 	password: str
 
 
 class UserLogin(BaseModel):
-	username: str | None
-	email: email_type | None
+	username_or_email: email_type | username_type
 	password: str
-
-	@model_validator(mode="after")
-	def validate_both_not_null(self):
-		if self.username is None and self.email is None:
-			raise ValueError("At least one of username or email must be provided")
-		return self
 
 
 class UserInfo(BaseModel):
