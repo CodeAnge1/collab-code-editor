@@ -1,0 +1,58 @@
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+}
+
+.landing {
+    text-align: center;
+}
+
+.landing h1 {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.landing p {
+    font-size: 1.4rem;
+    color: #d1d5db;
+    margin-bottom: 3rem;
+}
+
+.actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.btn {
+    padding: 0.9rem 2.2rem;
+    font-size: 1.1rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.btn.primary {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn.secondary {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--accent-primary);
+}
+
+.btn.secondary:hover {
+    background-color: rgba(139, 92, 246, 0.1);
+}
