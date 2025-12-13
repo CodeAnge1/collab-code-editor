@@ -1,10 +1,13 @@
+import enum
+import uuid
 import datetime as dt
 from typing import Annotated, List
 
-from sqlalchemy import String, ForeignKey, text
+from sqlalchemy import String, ForeignKey, text, Uuid, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from app.schemas.rooms import RoomType
 
 created_at = Annotated[dt.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
 
@@ -12,9 +15,19 @@ created_at = Annotated[dt.datetime, mapped_column(server_default=text("TIMEZONE(
 class Room(Base):
 	__tablename__ = "rooms"
 
-	id: Mapped[int] = mapped_column(primary_key=True)
+	id: Mapped[uuid.UUID] = mapped_column(
+		Uuid(as_uuid=True),
+		primary_key=True,
+		server_default=text("gen_random_uuid()")
+	)
 	name: Mapped[str] = mapped_column(String(100))
 	owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+	type: Mapped[RoomType] = mapped_column(
+		Enum(RoomType),
+		default=RoomType.PUBLIC,
+		nullable=False
+	)
+	hashed_password: Mapped[str] = mapped_column(nullable=True)
 	created_at: Mapped[created_at]
 
 	users: Mapped[List[RoomUser]] = relationship(
@@ -28,7 +41,10 @@ class Room(Base):
 class RoomUser(Base):
 	__tablename__ = "room_users"
 
-	room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), primary_key=True)
+	room_id: Mapped[uuid.UUID] = mapped_column(
+		ForeignKey("rooms.id"),
+		primary_key=True
+	)
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
 	role: Mapped[str] = mapped_column(String(20), default="reader")
 
