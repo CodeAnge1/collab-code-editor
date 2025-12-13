@@ -14,4 +14,13 @@ class User(Base):
 	email: Mapped[str] = mapped_column(String(256), unique=True)
 	hashed_password: Mapped[str] = mapped_column(nullable=False)
 
-	room_users: Mapped[List["RoomUser"]] = relationship("RoomUser", back_populates="user")
+	room_users: Mapped[List["RoomUser"]] = relationship(
+		"RoomUser",
+		back_populates="user"
+	)
+	sessions: Mapped[List["Session"]] = relationship(
+		"Session",
+		back_populates="user",
+		cascade="all, delete-orphan",
+		passive_deletes=True
+	)
