@@ -23,14 +23,11 @@ class DBConfig(BaseSettings):
 	)
 
 
-class JWTConfig(BaseSettings):
-	secret_key: SecretStr = Field(alias="JWT_SECRET_KEY")
-	algorithm: str = Field(alias="JWT_ALGORITHM", default="HS256")
-	access_token_expire_minutes: int = Field(alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES", default=30)
-	refresh_token_expire_days: int = Field(alias="JWT_REFRESH_TOKEN_EXPIRE_DAYS", default=7)
+class SessionConfig(BaseSettings):
+	expire_days: int = Field(default=30, alias="SESSION_EXPIRE_DAYS")
 
 	model_config = SettingsConfigDict(
-		env_prefix="JWT_",
+		env_prefix="SESSION_",
 		env_file="settings/.env",
 		extra="ignore"
 	)
@@ -38,7 +35,7 @@ class JWTConfig(BaseSettings):
 
 class Settings(BaseSettings):
 	db_cfg: DBConfig = Field(default_factory=DBConfig)
-	jwt_cfg: JWTConfig = Field(default_factory=JWTConfig)
+	sess_cfg: SessionConfig = Field(default_factory=SessionConfig)
 
 	class Config:
 		env_file = "settings/.env"
