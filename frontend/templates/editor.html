@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor - CoopCode</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/editor.css">
+
+    <link rel="stylesheet" href="../lib/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="../lib/codemirror/theme/dracula.css">
+
+    <script src="../lib/codemirror/lib/codemirror.js"></script>
+
+    <script src="../lib/codemirror/mode/meta.js"></script>
+    <script src="../lib/codemirror/addon/selection/active-line.js"></script>
+    <script src="../lib/codemirror/addon/scroll/simplescrollbars.js"></script>
+    <link rel="stylesheet" href="../lib/codemirror/addon/scroll/simplescrollbars.css">
+
+    <script src="../static/js/editor.js" defer></script>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h1>{CoopCode}</h1>
+    </div>
+    <div class="room-info">
+        <span class="room-name">{Room Name}</span>
+    </div>
+    <div class="user-info">
+        <span class="username">Username</span>
+        <button class="logout-btn">Leave Room</button>
+    </div>
+</header>
+
+<main class="editor-container">
+    <div class="editor-area">
+        <div class="editor-header">
+            <div class="file-tabs">
+                <div class="file-tab active" id="current-file-tab">
+                    <span class="file-tab-name">untitled.txt</span>
+                </div>
+            </div>
+            <div class="header-buttons">
+                <button class="settings-btn">Settings</button>
+            </div>
+        </div>
+        <div class="code-editor">
+            <label for="code-input"></label><textarea id="code-input"></textarea>
+        </div>
+    </div>
+</main>
+
+<div id="settings-popup" class="popup">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2>Settings</h2>
+            <span class="close">×</span>
+        </div>
+        <div class="field">
+            <label for="file-name-input">File name</label>
+            <input minlength="1" maxlength="60" type="text" id="file-name-input" value="untitled.txt">
+        </div>
+        <div class="field">
+            <label for="theme-search-input">Theme</label>
+            <div class="theme-select-wrapper">
+                <input maxlength="40" type="text" id="theme-search-input" placeholder="Search theme..." autocomplete="off">
+                <div class="theme-dropdown" id="theme-list"></div>
+            </div>
+        </div>
+        <button class="save-btn">Save</button>
+    </div>
+</div>
+</body>
+</html>
