@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoopCode</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/rooms.css">
+    <script src="../static/js/rooms.js"></script>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h1>{CoopCode}</h1>
+    </div>
+    <div class="user-info">
+        <span class="username">Username</span>
+        <button id="logout-btn" class="logout-btn">Logout</button>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <h2>Collaborate. Create. Code. Together.</h2>
+        <div class="hero-subtitle">
+            <p>Join or create a coding room to share ideas, work on projects, and learn with others.</p>
+            <div class="hero-buttons">
+                <button class="join-room-btn">Join Room</button>
+                <button class="create-room-btn" id="create-room-btn">Create Room</button>
+            </div>
+        </div>
+    </section>
+    <section class="available-rooms">
+        <h3>Your Rooms</h3>
+        <div class="rooms-grid">
+        </div>
+    </section>
+</main>
+<div id="create-room-popup" class="create-room-popup">
+    <div class="content">
+        <h2>Create room</h2>
+        <div class="room-form">
+            <div class="field" id="name-field">
+                <label for="name">Room name</label>
+                <input maxlength="40" type="text" id="name" autocomplete="false" placeholder="room name" required>
+                <span class="error-msg">Room name is required</span>
+            </div>
+            <div class="field" id="room-type-field">
+                <label for="room-type">Room type</label>
+                <div class="room-type-select">
+                    <select name="room-type" id="room-type" onchange="roomTypeChanged(this)">
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="field hidden" id="password-field">
+                <label for="password">Password (optional)</label>
+                <input maxlength="100" type="password" id="password" placeholder="password" disabled>
+                <span class="error-msg">Password is required for private room</span>
+            </div>
+            <div class="button-row">
+                <button id="cancel-btn" class="cancel-btn">Cancel</button>
+                <button id="create-btn" class="create-btn">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
