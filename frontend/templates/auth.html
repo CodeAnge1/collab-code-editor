@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoopCode</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/auth.css">
+    <script src="../static/js/auth.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>CoopCode</h1>
+
+    <div class="toggle">
+        <button class="active" data-mode="login">Sign in</button>
+        <button data-mode="register">Sign up</button>
+    </div>
+    <form id="form">
+        <div class="field" id="identifier-field">
+            <input maxlength="256" type="text" id="identifier" placeholder="Username or Email" required>
+            <span class="error-msg"></span>
+        </div>
+
+        <div class="field hidden" id="username-field">
+            <input minlength="6" maxlength="40" type="text" id="username" placeholder="Username" disabled>
+            <span class="error-msg"></span>
+        </div>
+
+        <div class="field hidden" id="email-field">
+            <input maxlength="256" type="email" id="email" placeholder="Email" disabled>
+            <span class="error-msg"></span>
+        </div>
+
+        <div class="field">
+            <input maxlength="100" type="password" id="password" placeholder="Password" required>
+            <span class="error-msg"></span>
+            <div class="password-rules hidden">
+                <div class="invalid" data-rule="length">At least 8 characters</div>
+                <div class="invalid" data-rule="letter">At least one letter</div>
+                <div class="invalid" data-rule="digit">At least one digit</div>
+                <div class="invalid" data-rule="special">At least one special character (!@#$%^&* etc.)</div>
+            </div>
+        </div>
+
+        <button type="submit" id="submit-btn">Sign in</button>
+        <div class="global-error"></div>
+    </form>
+</div>
+</body>
+</html>
