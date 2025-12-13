@@ -1,7 +1,14 @@
 import datetime as dt
-from typing import List
+import enum
+from typing import List, Self
+from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+
+
+class RoomType(enum.Enum):
+	PUBLIC = "public"
+	PRIVATE = "private"
 
 
 class RoomUserCreate(BaseModel):
@@ -10,7 +17,7 @@ class RoomUserCreate(BaseModel):
 
 
 class RoomUserInfo(RoomUserCreate):
-	room_id: int
+	room_id: UUID
 
 	class Config:
 		from_attributes = True
@@ -18,11 +25,21 @@ class RoomUserInfo(RoomUserCreate):
 
 class RoomCreate(BaseModel):
 	name: str
+	type: RoomType = RoomType.PUBLIC
+	password: str | None = None
+
+	@model_validator(mode='after')
+	def type_validator(self) -> Self:
+		if self.type == RoomType.PRIVATE and not self.password:
+			raise ValueError("Password is required")
+		return self
 
 
-class RoomInfo(RoomCreate):
-	id: int
+class RoomInfo(BaseModel):
+	id: UUID
+	name: str
 	owner_id: int
+	type: RoomType
 	created_at: dt.datetime
 	users: List[RoomUserInfo] = []
 
