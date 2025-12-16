@@ -1,22 +1,53 @@
+import { EditorView, lineNumbers, highlightActiveLine } from "@codemirror/view";
+import { indentMore, indentLess } from '@codemirror/commands';
+import { Compartment, EditorState } from "@codemirror/state";
+import { languages } from '@codemirror/language-data';
+import {indentUnit} from "@codemirror/language";
+import { minimalSetup } from "codemirror";
+import {
+    abcdef, abyss, androidstudio, andromeda,
+    atomone, aura, bespin, dracula,
+    gruvboxDark, kimbie, material, monokai,
+    monokaiDimmed, noctisLilac, nord, okaidia,
+    quietlight, red, tokyoNight, tokyoNightStorm,
+    tokyoNightDay, tomorrowNightBlue
+} from '@uiw/codemirror-themes-all';
+
+
 const maxLength = 500000;
+let currentFileName = 'untitled.txt';
+let currentTheme = 'dracula';
 
-var editorInstance;
-var currentFileName = 'untitled.txt';
-var currentTheme = 'dracula';
+let editorInstance;
+const themeConfig = new Compartment();
+const languageConfig = new Compartment();
 
-const themes = [
-    "3024-day", "3024-night", "abbott", "abcdef", "ambiance-mobile", "ambiance",
-    "ayu-dark", "ayu-mirage", "base16-dark", "base16-light", "bespin", "blackboard",
-    "cobalt", "colorforth", "darcula", "dracula", "duotone-dark", "duotone-light",
-    "eclipse", "elegant", "erlang-dark", "gruvbox-dark", "hopscotch", "icecoder", "idea",
-    "isotope", "juejin", "lesser-dark", "liquibyte", "lucario", "material-darker",
-    "material-ocean", "material-palenight", "material", "mbo", "mdn-like", "midnight",
-    "monokai", "moxer", "neat", "neo", "night", "nord", "oceanic-next", "panda-syntax",
-    "paraiso-dark", "paraiso-light", "pastel-on-dark", "railscasts", "rubyblue", "seti",
-    "shadowfox", "solarized", "ssms", "the-matrix", "tomorrow-night-bright",
-    "tomorrow-night-eighties", "ttcn", "twilight", "vibrant-ink", "xq-dark", "xq-light",
-    "yeti", "yonce", "zenburn"
-];
+const themeMap = {
+    "abcdef": abcdef,
+    "abyss": abyss,
+    "androidstudio": androidstudio,
+    "andromeda": andromeda,
+    "atomone": atomone,
+    "aura": aura,
+    "bespin": bespin,
+    "dracula": dracula,
+    "gruvbox-dark": gruvboxDark,
+    "kimbie": kimbie,
+    "material": material,
+    "monokai": monokai,
+    "monokai-dimmed": monokaiDimmed,
+    "noctis-lilac": noctisLilac,
+    "nord": nord,
+    "okaidia": okaidia,
+    "quietlight": quietlight,
+    "red": red,
+    "tokyo-night": tokyoNight,
+    "tokyo-night-storm": tokyoNightStorm,
+    "tokyo-night-day": tokyoNightDay,
+    "tomorrow-night-blue": tomorrowNightBlue
+};
+
+const themes = Object.keys(themeMap);
 
 document.addEventListener('DOMContentLoaded', function () {
     initEditor();
@@ -113,30 +144,62 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 })
 
+function checkMaxLength(update) {
+    const curLength = update.state.doc.length;
+    if (curLength > maxLength) {
+        const cursor = update.state.selection.main;
+        cursor.from = cursor.from > maxLength ? maxLength : cursor.from;
+        cursor.to = cursor.to > maxLength ? maxLength : cursor.to;
+        update.view.dispatch({
+            changes: {
+                from: maxLength,
+                to: curLength,
+                insert: ''
+            },
+            selection: cursor
+        });
+        alert('Character limit exceeded: ' + maxLength);
+    }
+}
+
+const maxLengthExtension = EditorView.updateListener.of((update) => {
+    if (update.docChanged) checkMaxLength(update);
+})
+
 function initEditor() {
-    const codeTextarea = document.getElementById("code-input")
-    editorInstance = CodeMirror.fromTextArea(codeTextarea, {
-        lineNumbers: true,
-        theme: "dracula",
-        styleActiveLine: true,
-        scrollbarStyle: "overlay",
-        mode: "text/plain",
-        indentUnit: 4,
-    })
-
+    let state = EditorState.create({
+        extensions: [
+            minimalSetup,
+            themeConfig.of(themeMap[currentTheme]),
+            languageConfig.of([]),
+            lineNumbers(),
+            highlightActiveLine(),
+            EditorState.tabSize.of(4),
+            indentUnit.of("    "),
+            EditorView.domEventHandlers({
+                keydown: (event, view) => {
+                    if (event.key === "Tab") {
+                        event.preventDefault();
+                        if (event.shiftKey) {
+                            indentLess(view);
+                        } else {
+                            indentMore(view);
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            }),
+            maxLengthExtension,
+        ],
+    });
+    editorInstance = new EditorView({
+        state,
+        parent: document.querySelector("#code-editor"),
+    });
     const style = document.createElement('style')
-    style.textContent = '.CodeMirror { height: 100% !important; }'
+    style.textContent = '.cm-editor { height: 100% !important; }'
     document.head.appendChild(style)
-
-    editorInstance.on('change', function () {
-        const value = editorInstance.getValue()
-        if (value.length > maxLength) {
-            const cursor = editorInstance.getCursor()
-            editorInstance.setValue(value.slice(0, maxLength));
-            editorInstance.setCursor(cursor)
-            alert('Character limit exceeded:' + maxLength);
-        }
-    })
 }
 
 function highlightItem(items, index) {
@@ -168,20 +231,17 @@ function renderThemeList() {
 }
 
 function applyTheme(themeName) {
-    currentTheme = themeName
+    const theme = themeMap[themeName];
 
-    document.querySelectorAll('link[data-codemirror-theme]').forEach(l => l.remove())
+    currentTheme = themeName;
 
-    if (currentTheme) {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = `../lib/codemirror/theme/${currentTheme}.css`
-        link.setAttribute('data-codemirror-theme', '')
-        link.onload = () => editorInstance.setOption('theme', currentTheme)
-        document.head.appendChild(link)
-    } else {
-        editorInstance.setOption('theme', '')
-    }
+    editorInstance.dispatch({
+        effects: themeConfig.reconfigure(theme)
+    });
+
+    document.querySelectorAll('.theme-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.theme === themeName);
+    });
 }
 
 function updateFileName(name) {
@@ -208,16 +268,30 @@ function saveSettings() {
     closeSettings()
 }
 
-function loadModeByFileName(filename) {
-    let info = CodeMirror.findModeByFileName(filename)
-    info = info ? info : CodeMirror.findModeByFileName(filename + ".txt")
+function setLanguage(language) {
+    editorInstance.dispatch({
+        effects: languageConfig.reconfigure(language || [])
+    });
+}
 
-    if (!CodeMirror.modes[info.mode]) {
-        const script = document.createElement('script')
-        script.src = `../lib/codemirror/mode/${info.mode}/${info.mode}.js`
-        script.onload = () => editorInstance.setOption('mode', info.mime)
-        document.head.appendChild(script)
+async function loadLanguage(languageDescription) {
+    try {
+        const language = await languageDescription.load();
+        setLanguage(language);
+    } catch (error) {
+        setLanguage(null);
+    }
+}
+
+function loadModeByFileName(filename) {
+    const languageDesc = languages.find(lang =>
+            lang.extensions && lang.extensions.some(ext =>
+                filename.toLowerCase().endsWith(ext.toLowerCase())
+            )
+    );
+    if (languageDesc) {
+        loadLanguage(languageDesc);
     } else {
-        editorInstance.setOption('mode', info.mime)
+        setLanguage(null);
     }
 }
