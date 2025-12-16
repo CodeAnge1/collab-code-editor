@@ -13,6 +13,8 @@ import {
     tokyoNightDay, tomorrowNightBlue
 } from '@uiw/codemirror-themes-all';
 
+import { collabManager } from './collab.js'
+
 
 const maxLength = 500000;
 let currentFileName = 'untitled.txt';
@@ -21,6 +23,7 @@ let currentTheme = 'dracula';
 let editorInstance;
 const themeConfig = new Compartment();
 const languageConfig = new Compartment();
+const collabConfig = new Compartment()
 
 const themeMap = {
     "abcdef": abcdef,
@@ -191,6 +194,7 @@ function initEditor() {
                 }
             }),
             maxLengthExtension,
+            collabConfig.of([]),
         ],
     });
     editorInstance = new EditorView({
@@ -200,6 +204,13 @@ function initEditor() {
     const style = document.createElement('style')
     style.textContent = '.cm-editor { height: 100% !important; }'
     document.head.appendChild(style)
+
+    collabManager.setCompartment(collabConfig);
+    setTimeout(() => {
+        const roomId = window.location.pathname.split('/').pop()
+        const userName = 'User_' + Math.floor(Math.random() * 10)
+        collabManager.connect(roomId, userName, editorInstance);
+    }, 500)
 }
 
 function highlightItem(items, index) {
